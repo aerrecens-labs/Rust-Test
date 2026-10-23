@@ -1,6 +1,6 @@
 # Task API — Rust Coding Test
 
-A small Rust Task API used as a **10-minute live coding exercise** for backend candidates.
+A medium-sized Rust Task API used as a **10-minute live coding exercise** for backend candidates.
 
 ## Quick start
 
@@ -10,9 +10,75 @@ cargo run
 
 Server runs at `http://localhost:3000`.
 
+The React board in `frontend/` renders that API. It does not implement task filtering.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 while the API is running. Status requests go to `GET /tasks`. Search, priority, and sort are browser-only.
+
 ## Candidate brief
 
-Give the candidate [`TODO.md`](./TODO.md). It contains the full task description, rules, and evaluation criteria.
+
+## Time Limit
+
+10 minutes
+
+## Task
+
+Implement task filtering in the Task API.
+
+`GET /tasks` accepts an optional `status` query parameter:
+
+- `all`
+- `active`
+- `completed`
+
+### Requirements
+
+- `all` returns every task.
+- `active` returns only incomplete tasks.
+- `completed` returns only completed tasks.
+- Invalid or missing `status` should behave like `all` (or return a clear 400 — either is fine if consistent).
+- Existing toggle behavior must continue working: `PATCH /tasks/:id/toggle`.
+
+### Bonus
+
+If you finish early, include a `count` field in the JSON response with the number of returned tasks.
+
+## Rules
+
+- Use Rust (`tiny_http` + `serde` are already configured).
+- Keep the existing project structure where practical.
+- Do not install unnecessary dependencies.
+- Focus on functionality and clean code.
+
+## Run
+
+```bash
+cargo run
+```
+
+Try:
+
+```bash
+curl "http://localhost:3000/tasks?status=active"
+curl -X PATCH "http://localhost:3000/tasks/1/toggle"
+```
+
+## Evaluation
+
+You will be evaluated on:
+
+* Understanding of the existing Rust code
+* Correct filtering logic
+* API behavior and edge cases
+* Code quality
+* Ability to work independently within the time limit
+
 
 ## What’s already implemented
 
@@ -38,13 +104,22 @@ Give the candidate [`TODO.md`](./TODO.md). It contains the full task description
 ## Project structure
 
 ```text
-Cargo.toml
-src/main.rs   # server + filter_tasks stub
+src/
+  data.rs        # mock tasks
+  tasks.rs       # store + filter_tasks stub
+  main.rs        # process entry
+  app/           # HTTP server and handler
+  http/          # request and response helpers
+  catalog.rs     # labels and teams
+  services.rs    # helpers around the in-memory store
+  domain.rs      # priorities and task views
 ```
+
+The exercise is still only `filter_tasks` in `src/tasks.rs`. The extra modules are supporting code and do not change the task endpoints.
 
 ## Interviewer notes
 
 - Time box: **10 minutes**
-- Core task: implement `filter_tasks` in `src/main.rs` for **all / active / completed**
+- Core task: implement `filter_tasks` in `src/tasks.rs` for **all / active / completed**
 - Optional bonus: include a `count` in the list response
 - Do not share a solution with the candidate before or during the exercise
